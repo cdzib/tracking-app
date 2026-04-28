@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--  Dev-only cleartext support for local/private network API testing  -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.1.76</domain>
+        <domain includeSubdomains="true">192.168.1.77</domain>
+        <domain includeSubdomains="true">192.168.1.85</domain>
+        <domain includeSubdomains="true">10.1.147.30</domain>
+        <domain includeSubdomains="true">https://nugget-gnarly-estate.ngrok-free.dev</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
