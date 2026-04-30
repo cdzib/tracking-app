@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:vagonetas_app/core/utils/utils.dart';
+import 'package:vagonetas_app/features/history/data/models/history_response.dart';
+import 'package:vagonetas_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:vagonetas_app/widgets/ambient_painter.dart';
-
-import '../../domain/models/historial_item.dart';
+import 'package:vagonetas_app/widgets/custom_back_button.dart';
+import 'package:vagonetas_app/widgets/paginate.dart';
 import '../viewmodel/historial_viewmodel.dart';
 
-class HistorialPage extends StatelessWidget {
+class HistorialPage extends StatefulWidget {
   const HistorialPage({super.key});
+
+  @override
+  State<HistorialPage> createState() => _HistorialPageState();
+}
+
+class _HistorialPageState extends State<HistorialPage> {
+  Key _paginateKey = UniqueKey();
+
+  Future<void> _reload() async {
+    setState(() => _paginateKey = UniqueKey());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,57 +55,59 @@ class HistorialPage extends StatelessWidget {
                 ),
               ),
               SafeArea(
-                child: Builder(
-                  builder: (context) {
-                    if (vm.isLoading) {
-                      return const _LoadingState();
-                    }
-
-                    if (vm.error != null) {
-                      return _ErrorState(
-                        message: vm.error!,
-                        onRetry: vm.loadHistorial,
-                      );
-                    }
-
-                    return RefreshIndicator(
-                      color: colorScheme.primary,
-                      backgroundColor: colorScheme.surface,
-                      onRefresh: vm.loadHistorial,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(24, 26, 24, 32),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _HistoryTopBar(totalTrips: vm.historial.length),
-                            const SizedBox(height: 28),
-                            _HistoryHeroCard(items: vm.historial, context: context),
-                            const SizedBox(height: 22),
-                            const _SectionLabel(label: 'REGISTRO DE VIAJES'),
-                            const SizedBox(height: 12),
-                            if (vm.historial.isEmpty)
-                              _EmptyState(onReload: vm.loadHistorial)
-                            else
-                              ...vm.historial.asMap().entries.map(
-                                (entry) {
-                                  final index = entry.key;
-                                  final item = entry.value;
-                                  return Padding(
-                                    padding: EdgeInsets.only(
-                                      bottom: index == vm.historial.length - 1
-                                          ? 0
-                                          : 14,
-                                    ),
-                                    child: _TripHistoryCard(item: item),
-                                  );
-                                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CustomBackButton(
+                                onTap: () => Navigator.pop(context),
                               ),
-                          ],
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: TopBar(
+                                  title: 'Historial',
+                                  subtitle:
+                                      ' ${vm.total > 0 ? vm.total : vm.historial.length} viajes registrados',
+                                  icon: Icons.history_rounded),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          // _HistoryHeroCard(
+                          // //     items: vm.historial, context: context),
+                          // const SizedBox(height: 22),
+                          const _SectionLabel(label: 'REGISTRO DE VIAJES'),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Paginate<History>(
+                        key: _paginateKey,
+                        pageSize: 10,
+                        fetchPage: vm.fetchHistorialPage,
+                        hasMore: vm.hasMoreHistorial,
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+                        loadingWidget: const _LoadingState(),
+                        emptyWidget: _EmptyState(onReload: _reload),
+                        errorBuilder: (error, retry) => _ErrorState(
+                          message: vm.error ?? error.toString(),
+                          onRetry: retry,
+                        ),
+                        itemBuilder: (context, item) => Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: _TripHistoryCard(item: item),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -103,65 +118,19 @@ class HistorialPage extends StatelessWidget {
   }
 }
 
-class _HistoryTopBar extends StatelessWidget {
-  final int totalTrips;
-
-  const _HistoryTopBar({required this.totalTrips});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            border: Border.all(
-                color: Theme.of(context).colorScheme.primary, width: 1.4),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.route_outlined,
-            color: Theme.of(context).colorScheme.primary,
-            size: 18,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'HISTORIAL',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      letterSpacing: 3.2,
-                    ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                '$totalTrips viajes registrados',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _HistoryHeroCard extends StatelessWidget {
-  final List<HistorialItem> items;
+  final List<History> items;
   final BuildContext context;
   const _HistoryHeroCard({required this.items, required this.context});
 
   int get completedCount => items
-      .where((item) => _tripStatus(item.descripcion, context).label == 'Completado')
+      .where((item) =>
+          _tripStatus(item.trip!.status!, context).label == 'Completado')
       .length;
 
   int get canceledCount => items
-      .where((item) => _tripStatus(item.descripcion, context).label == 'Cancelado')
+      .where((item) =>
+          _tripStatus(item.trip!.status!, context).label == 'Cancelado')
       .length;
 
   @override
@@ -170,7 +139,7 @@ class _HistoryHeroCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
@@ -188,12 +157,14 @@ class _HistoryHeroCard extends StatelessWidget {
         children: [
           Text(
             'Tus movimientos recientes',
-            style: theme.textTheme.headlineLarge,
+            style: theme.textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.w800, color: colorScheme.onSurface),
           ),
           const SizedBox(height: 10),
           Text(
             'Consulta reservas completadas y canceladas con una vista mas clara y profesional.',
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 20),
           Container(
@@ -262,9 +233,9 @@ class _MetricBlock extends StatelessWidget {
           label.toUpperCase(),
           style: const TextStyle(
             color: Colors.white30,
-            fontSize: 10.5,
+            fontSize: 10,
             fontWeight: FontWeight.w700,
-            letterSpacing: 1.8,
+            letterSpacing: 1.6,
           ),
         ),
         const SizedBox(height: 8),
@@ -282,14 +253,14 @@ class _MetricBlock extends StatelessWidget {
 }
 
 class _TripHistoryCard extends StatelessWidget {
-  final HistorialItem item;
+  final History item;
 
   const _TripHistoryCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    final status = _tripStatus(item.descripcion, context);
-    final route = _extractRoute(item.descripcion);
+    final status = _tripStatus(item.trip!.status!, context);
+    final route = _extractRoute(item.trip!.route!.name ?? 'Viaje registrado');
 
     return Container(
       decoration: BoxDecoration(
@@ -298,7 +269,7 @@ class _TripHistoryCard extends StatelessWidget {
         border: Border.all(color: Colors.white10),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -334,7 +305,7 @@ class _TripHistoryCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        item.descripcion,
+                        item.trip!.status ?? '',
                         style: const TextStyle(
                           color: Colors.white54,
                           fontSize: 12.5,
@@ -361,7 +332,7 @@ class _TripHistoryCard extends StatelessWidget {
                   Expanded(
                     child: _InfoColumn(
                       label: 'Fecha',
-                      value: DateFormat('dd MMM yyyy').format(item.fecha),
+                      value: DateTimeUtils.formatShortDate(item.createdAt),
                     ),
                   ),
                   const SizedBox(
@@ -371,7 +342,7 @@ class _TripHistoryCard extends StatelessWidget {
                   Expanded(
                     child: _InfoColumn(
                       label: 'Hora',
-                      value: DateFormat('HH:mm').format(item.fecha),
+                      value: DateTimeUtils.formatTime(item.createdAt),
                     ),
                   ),
                   const SizedBox(
@@ -381,7 +352,7 @@ class _TripHistoryCard extends StatelessWidget {
                   Expanded(
                     child: _InfoColumn(
                       label: 'Folio',
-                      value: '#${item.id}',
+                      value: '#${item.bookingId}',
                     ),
                   ),
                 ],

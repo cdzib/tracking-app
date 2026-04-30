@@ -6,7 +6,8 @@ import '../../domain/usecases/get_available_trips_usecase.dart';
 import '../../domain/usecases/get_recent_trips_usecase.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  bool get isLoading => isLoadingNextTrip || isLoadingAvailableTrips || isLoadingRecentTrips;
+  bool get isLoading =>
+      isLoadingNextTrip || isLoadingAvailableTrips || isLoadingRecentTrips;
   final GetNextTripUseCase getNextTripUseCase;
   final GetAvailableTripsUseCase getAvailableTripsUseCase;
   final GetRecentTripsUseCase getRecentTripsUseCase;
@@ -33,9 +34,11 @@ class HomeViewModel extends ChangeNotifier {
   String? errorRecentTrips;
 
   Future<void> loadHomeData() async {
-    _loadNextTrip();
-    _loadAvailableTrips();
-    _loadRecentTrips();
+    await Future.wait([
+      _loadNextTrip(),
+      _loadAvailableTrips(),
+      _loadRecentTrips(),
+    ]);
   }
 
   Future<void> _loadNextTrip() async {

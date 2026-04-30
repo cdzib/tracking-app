@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 import 'package:vagonetas_app/core/di/injector.dart';
+import 'package:vagonetas_app/core/utils/utils.dart';
 import 'package:vagonetas_app/features/history/data/models/history_response.dart';
 import 'package:vagonetas_app/features/trip/domain/models/trip_recents.dart';
 import 'package:vagonetas_app/widgets/ambient_painter.dart';
@@ -34,9 +34,12 @@ class _HomeContentBody extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
-          Positioned.fill(child: CustomPaint(painter: AmbientPainter(colorScheme))),
+          Positioned.fill(
+              child: CustomPaint(painter: AmbientPainter(colorScheme))),
           Positioned(
-            top: 0, left: 0, right: 0,
+            top: 0,
+            left: 0,
+            right: 0,
             child: Container(
               height: 2,
               decoration: BoxDecoration(
@@ -53,113 +56,134 @@ class _HomeContentBody extends StatelessWidget {
             ),
           ),
           SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 26, 24, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _Header(),
-                        const SizedBox(height: 22),
-                        const _SectionLabel(label: 'PRÓXIMO VIAJE'),
-                        const SizedBox(height: 12),
-                        if (vm.isLoadingNextTrip)
-                          const Center(child: CircularProgressIndicator()),
-                        if (vm.errorNextTrip != null)
-                          ErrorPage(
-                            error: vm.errorNextTrip!,
-                            onRetry: () => vm.loadHomeData(),
-                          ),
-                        if (!vm.isLoadingNextTrip && vm.errorNextTrip == null && vm.nextTrip != null)
-                          _NextTripCard(trip: vm.nextTrip),
-                        if (!vm.isLoadingNextTrip && vm.errorNextTrip == null && vm.nextTrip == null)
-                          const EmptyPage(message: 'No hay información de tu próximo viaje.'),
-                        const SizedBox(height: 22),
-                        const _SectionLabel(label: 'ACCESOS RÁPIDOS'),
-                        const SizedBox(height: 12),
-                        const _QuickAccess(),
-                        const SizedBox(height: 22),
-                        const _SectionLabel(label: 'VIAJES DISPONIBLES AHORA'),
-                        const SizedBox(height: 12),
-                      ],
+            child: RefreshIndicator(
+              color: colorScheme.primary,
+              backgroundColor: colorScheme.surface,
+              onRefresh: vm.loadHomeData,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 26, 24, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _Header(),
+                          const SizedBox(height: 22),
+                          const _SectionLabel(label: 'PRÓXIMO VIAJE'),
+                          const SizedBox(height: 12),
+                          if (vm.isLoadingNextTrip)
+                            const Center(child: CircularProgressIndicator()),
+                          if (vm.errorNextTrip != null)
+                            ErrorPage(
+                              error: vm.errorNextTrip!,
+                              onRetry: () => vm.loadHomeData(),
+                            ),
+                          if (!vm.isLoadingNextTrip &&
+                              vm.errorNextTrip == null &&
+                              vm.nextTrip != null)
+                            _NextTripCard(trip: vm.nextTrip),
+                          if (!vm.isLoadingNextTrip &&
+                              vm.errorNextTrip == null &&
+                              vm.nextTrip == null)
+                            const EmptyPage(
+                                message:
+                                    'No hay información de tu próximo viaje.'),
+                          const SizedBox(height: 22),
+                          const _SectionLabel(label: 'ACCESOS RÁPIDOS'),
+                          const SizedBox(height: 12),
+                          const _QuickAccess(),
+                          const SizedBox(height: 22),
+                          const _SectionLabel(
+                              label: 'VIAJES DISPONIBLES AHORA'),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 140,
-                    child: Builder(
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: 140,
+                      child: Builder(
+                        builder: (_) {
+                          if (vm.isLoadingAvailableTrips) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (vm.errorAvailableTrips != null) {
+                            return ErrorPage(
+                              error: vm.errorAvailableTrips!,
+                              onRetry: () => vm.loadHomeData(),
+                            );
+                          }
+                          if (vm.availableTrips.isEmpty) {
+                            return const EmptyPage(
+                                message:
+                                    'No hay viajes disponibles en este momento.');
+                          }
+                          return ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            itemCount: vm.availableTrips.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 12),
+                            itemBuilder: (_, i) =>
+                                _AvailableTripCard(trip: vm.availableTrips[i]),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          _SectionLabel(label: 'ÚLTIMOS VIAJES'),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                    sliver: Builder(
                       builder: (_) {
-                        if (vm.isLoadingAvailableTrips) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (vm.isLoadingRecentTrips) {
+                          return const SliverToBoxAdapter(
+                              child:
+                                  Center(child: CircularProgressIndicator()));
                         }
-                        if (vm.errorAvailableTrips != null) {
-                          return ErrorPage(
-                            error: vm.errorAvailableTrips!,
-                            onRetry: () => vm.loadHomeData(),
+                        if (vm.errorRecentTrips != null) {
+                          return SliverToBoxAdapter(
+                            child: ErrorPage(
+                              error: vm.errorRecentTrips!,
+                              onRetry: () => vm.loadHomeData(),
+                            ),
                           );
                         }
-                        if (vm.availableTrips.isEmpty) {
-                          return const EmptyPage(message: 'No hay viajes disponibles en este momento.');
+                        if (vm.recentTrips.isEmpty) {
+                          return const SliverToBoxAdapter(
+                            child: EmptyPage(
+                                message: 'No hay historial de viajes.'),
+                          );
                         }
-                        return ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          itemCount: vm.availableTrips.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 12),
-                          itemBuilder: (_, i) => _AvailableTripCard(trip: vm.availableTrips[i]),
+                        return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (_, i) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: _RecentTripTile(recent: vm.recentTrips[i]),
+                            ),
+                            childCount: vm.recentTrips.length,
+                          ),
                         );
                       },
                     ),
                   ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 22, 24, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        _SectionLabel(label: 'ÚLTIMOS VIAJES'),
-                        SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                  sliver: Builder(
-                    builder: (_) {
-                      if (vm.isLoadingRecentTrips) {
-                        return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-                      }
-                      if (vm.errorRecentTrips != null) {
-                        return SliverToBoxAdapter(
-                          child: ErrorPage(
-                            error: vm.errorRecentTrips!,
-                            onRetry: () => vm.loadHomeData(),
-                          ),
-                        );
-                      }
-                      if (vm.recentTrips.isEmpty) {
-                        return const SliverToBoxAdapter(
-                          child: EmptyPage(message: 'No hay historial de viajes.'),
-                        );
-                      }
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (_, i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _RecentTripTile(recent: vm.recentTrips[i]),
-                          ),
-                          childCount: vm.recentTrips.length,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -175,18 +199,25 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final hour = now.hour;
-    final greeting = hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
+    final greeting = hour < 12
+        ? 'Buenos días'
+        : hour < 18
+            ? 'Buenas tardes'
+            : 'Buenas noches';
 
     return Row(
       children: [
         Container(
-          width: 46, height: 46,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
             shape: BoxShape.circle,
-            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.4),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary, width: 1.4),
           ),
-          child: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary, size: 22),
+          child: Icon(Icons.person_rounded,
+              color: Theme.of(context).colorScheme.primary, size: 22),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -196,17 +227,20 @@ class _Header extends StatelessWidget {
               Text(
                 greeting,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                  fontSize: 12.5,
-                ),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.4),
+                      fontSize: 12.5,
+                    ),
               ),
               const SizedBox(height: 2),
               Text(
                 'Juan Pérez',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w800,
-                ),
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w800,
+                    ),
               ),
             ],
           ),
@@ -216,14 +250,15 @@ class _Header extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
           ),
           child: Text(
             'Pasajero',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              letterSpacing: 0.5,
-            ),
+                  color: Theme.of(context).colorScheme.primary,
+                  letterSpacing: 0.5,
+                ),
           ),
         ),
       ],
@@ -249,7 +284,8 @@ class _NextTripCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: colorScheme.primary.withOpacity(0.25)),
         ),
-        child: Text('No tienes viajes próximos', style: theme.textTheme.bodyMedium),
+        child: Text('No tienes viajes próximos',
+            style: theme.textTheme.bodyMedium),
       );
     }
     return Container(
@@ -272,11 +308,13 @@ class _NextTripCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: colorScheme.secondary.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: colorScheme.secondary.withOpacity(0.3)),
+                  border:
+                      Border.all(color: colorScheme.secondary.withOpacity(0.3)),
                 ),
                 child: Text(
                   trip!['status'] ?? '● Confirmado',
@@ -308,13 +346,21 @@ class _NextTripCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              Icon(Icons.directions_bus_rounded, color: colorScheme.onSurface.withOpacity(0.4), size: 14),
+              Icon(Icons.directions_bus_rounded,
+                  color: colorScheme.onSurface.withOpacity(0.4), size: 14),
               const SizedBox(width: 6),
-              Text(trip!['vehicle'] ?? '', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.4), fontSize: 13)),
+              Text(trip!['vehicle'] ?? '',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.4),
+                      fontSize: 13)),
               const SizedBox(width: 16),
-              Icon(Icons.access_time_rounded, color: colorScheme.onSurface.withOpacity(0.4), size: 14),
+              Icon(Icons.access_time_rounded,
+                  color: colorScheme.onSurface.withOpacity(0.4), size: 14),
               const SizedBox(width: 6),
-              Text(trip!['time'] ?? '', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.4), fontSize: 13)),
+              Text(trip!['time'] ?? '',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.4),
+                      fontSize: 13)),
             ],
           ),
           const SizedBox(height: 16),
@@ -357,16 +403,39 @@ class _QuickAccess extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final items = [
-      _QuickItem(icon: Icons.directions_bus_rounded, label: 'Reservar', color: colorScheme.secondary),
-      _QuickItem(icon: Icons.map_rounded, label: 'Ver mapa', color: const Color(0xFF7EA1FF)),
-      _QuickItem(icon: Icons.receipt_long_rounded, label: 'Mis reservas', color: const Color(0xFF8ED1A5)),
-      _QuickItem(icon: Icons.person_outline_rounded, label: 'Mi perfil', color: const Color(0xFFEAA86C)),
+      _QuickItem(
+          icon: Icons.directions_bus_rounded,
+          label: 'Reservar',
+          color: colorScheme.secondary,
+          route: '/reservar'),
+      _QuickItem(
+          icon: Icons.map_rounded,
+          label: 'Ver mapa',
+          color: const Color(0xFF7EA1FF),
+          route: '/tracking'),
+      _QuickItem(
+          icon: Icons.receipt_long_rounded,
+          label: 'Mis reservas',
+          color: const Color(0xFF8ED1A5),
+          route: '/mis_reservas'),
+      _QuickItem(
+          icon: Icons.person_outline_rounded,
+          label: 'Mi perfil',
+          color: const Color(0xFFEAA86C),
+          route: '/perfil'),
     ];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: items
-          .map((item) => Expanded(child: _QuickAccessTile(item: item)))
+          .map((item) => Expanded(
+                child: _QuickAccessTile(
+                  item: item,
+                  onTap: () {
+                    Navigator.pushNamed(context, item.route);
+                  },
+                ),
+              ))
           .toList(),
     );
   }
@@ -376,12 +445,15 @@ class _QuickItem {
   final IconData icon;
   final String label;
   final Color color;
-  const _QuickItem({required this.icon, required this.label, required this.color});
+  final String route;
+  const _QuickItem(
+      {required this.icon, required this.label, required this.color, required this.route});
 }
 
 class _QuickAccessTile extends StatelessWidget {
   final _QuickItem item;
-  const _QuickAccessTile({required this.item});
+  final VoidCallback? onTap;
+  const _QuickAccessTile({required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -391,13 +463,14 @@ class _QuickAccessTile extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 70, maxHeight: 90),
       alignment: Alignment.center,
       child: GestureDetector(
-        onTap: () {},
+        onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 44, height: 44,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: item.color.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(14),
@@ -408,7 +481,9 @@ class _QuickAccessTile extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               item.label,
-              style: TextStyle(color: colorScheme.onBackground.withOpacity(0.54), fontSize: 11),
+              style: TextStyle(
+                  color: colorScheme.onBackground.withOpacity(0.54),
+                  fontSize: 11),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
@@ -444,16 +519,18 @@ class _AvailableTripCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 34, height: 34,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: colorScheme.secondary.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.route_outlined, color: colorScheme.secondary, size: 17),
+                child: Icon(Icons.route_outlined,
+                    color: colorScheme.secondary, size: 17),
               ),
               const Spacer(),
               Text(
-                formatDateTime(trip.trip?.datetime?.toString()),
+                DateTimeUtils.formatDateTime(trip.trip?.datetime?.toString()),
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: colorScheme.primary,
                   fontSize: 12,
@@ -496,7 +573,8 @@ class _RecentTripTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCompleted = recent.status == 'completado';
-    final statusColor = isCompleted ? const Color(0xFF8ED1A5) : const Color(0xFFEAA86C);
+    final statusColor =
+        isCompleted ? const Color(0xFF8ED1A5) : const Color(0xFFEAA86C);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Container(
@@ -509,13 +587,16 @@ class _RecentTripTile extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 40, height: 40,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               color: statusColor.withOpacity(0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              isCompleted ? Icons.check_circle_outline_rounded : Icons.cancel_outlined,
+              isCompleted
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.cancel_outlined,
               color: statusColor,
               size: 20,
             ),
@@ -535,7 +616,8 @@ class _RecentTripTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  formatDateTime(recent.trip?.datetime?.toString()),
+                  DateTimeUtils.formatDateTime(
+                      recent.trip?.datetime?.toString()),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
@@ -576,10 +658,26 @@ const _mockTrips = [
 ];
 
 const _mockRecent = [
-  {'route': 'Centro → Aeropuerto', 'date': 'Hoy, 06:30 AM', 'status': 'completado'},
-  {'route': 'Norte → Sur Terminal', 'date': 'Ayer, 08:00 AM', 'status': 'completado'},
-  {'route': 'Plaza → Universidad', 'date': '24 Abr, 07:45 AM', 'status': 'cancelado'},
-  {'route': 'Mercado → Hospital', 'date': '22 Abr, 09:00 AM', 'status': 'completado'},
+  {
+    'route': 'Centro → Aeropuerto',
+    'date': 'Hoy, 06:30 AM',
+    'status': 'completado'
+  },
+  {
+    'route': 'Norte → Sur Terminal',
+    'date': 'Ayer, 08:00 AM',
+    'status': 'completado'
+  },
+  {
+    'route': 'Plaza → Universidad',
+    'date': '24 Abr, 07:45 AM',
+    'status': 'cancelado'
+  },
+  {
+    'route': 'Mercado → Hospital',
+    'date': '22 Abr, 09:00 AM',
+    'status': 'completado'
+  },
 ];
 
 class _SectionLabel extends StatelessWidget {
@@ -600,26 +698,5 @@ class _SectionLabel extends StatelessWidget {
         letterSpacing: 1.8,
       ),
     );
-  }
-}
-
-String formatDateTime(String? dateTimeStr) {
-  if (dateTimeStr == null) return '';
-  try {
-    final dateTime = DateTime.parse(dateTimeStr);
-    final now = DateTime.now();
-    final difference = dateTime.difference(now);
-
-    if (difference.inDays == 0) {
-      return 'Hoy, ${DateFormat('h:m a').format(dateTime)}';
-    } else if (difference.inDays == 1) {
-      return 'Mañana, ${DateFormat('h:m a').format(dateTime)}';
-    } else if (difference.inDays == -1) {
-      return 'Ayer, ${DateFormat('h:m a').format(dateTime)}';
-    } else {
-      return DateFormat('dd MMM, h:m a').format(dateTime);
-    }
-  } catch (e) {
-    return dateTimeStr; // Si no se puede parsear, devuelve el string original
   }
 }

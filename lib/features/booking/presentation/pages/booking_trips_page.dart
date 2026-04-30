@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vagonetas_app/core/utils/utils.dart';
 import 'package:vagonetas_app/features/booking/domain/models/trip_summary.dart';
 import 'package:vagonetas_app/features/booking/presentation/pages/booking_seats_page.dart';
 import 'package:vagonetas_app/features/settings/presentation/pages/settings_page.dart';
@@ -191,7 +192,7 @@ class _TripCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Salida: ${trip.datetime}',
+                          'Salida: ${DateTimeUtils.formatRelative(trip.datetime)}',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 12.5,
