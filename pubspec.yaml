@@ -44,6 +44,7 @@ dependencies:
   logger: ^2.7.0
   equatable: ^2.0.8
   dartz: ^0.10.1
+  google_fonts: ^6.3.2
 
 
 dev_dependencies:

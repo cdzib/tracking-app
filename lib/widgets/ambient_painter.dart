@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AmbientPainter extends CustomPainter {
+  final ColorScheme colorScheme;
+  AmbientPainter(this.colorScheme);
+
   @override
   void paint(Canvas canvas, Size size) {
     final glowPaint = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFFD4A853).withOpacity(0.12),
+          colorScheme.secondary.withOpacity(0.12),
           Colors.transparent,
         ],
       ).createShader(

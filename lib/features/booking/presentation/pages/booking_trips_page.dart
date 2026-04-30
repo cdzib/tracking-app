@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vagonetas_app/features/booking/domain/models/trip_summary.dart';
 import 'package:vagonetas_app/features/booking/presentation/pages/booking_seats_page.dart';
+import 'package:vagonetas_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:vagonetas_app/widgets/ambient_painter.dart';
 import 'package:vagonetas_app/widgets/paginate.dart';
 import '../viewmodel/booking_viewmodel.dart';
@@ -19,7 +20,7 @@ class BookingTripsPage extends StatelessWidget {
           backgroundColor: theme.scaffoldBackgroundColor,
           body: Stack(
             children: [
-              Positioned.fill(child: CustomPaint(painter: AmbientPainter())),
+              Positioned.fill(child: CustomPaint(painter: AmbientPainter(colorScheme))),
               Positioned(
                 top: 0,
                 left: 0,
@@ -64,47 +65,9 @@ class BookingTripsPage extends StatelessWidget {
                                       // Top bar
                                       Row(
                                         children: [
-                                          Container(
-                                            width: 38,
-                                            height: 38,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: const Color(0xFFD4A853),
-                                                width: 1.4,
-                                              ),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.route_outlined,
-                                              color: Color(0xFFD4A853),
-                                              size: 18,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
+                                          
                                           Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'VIAJES',
-                                                  style: TextStyle(
-                                                    color: Color(0xFFD4A853),
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w700,
-                                                    letterSpacing: 3.2,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 3),
-                                                Text(
-                                                  'Selecciona tu próximo recorrido',
-                                                  style: TextStyle(
-                                                    color: colorScheme.onBackground.withOpacity(0.6),
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                            child: TopBar(title: 'VIAJES', subtitle: 'Selecciona tu próximo recorrido', icon: Icons.route_outlined),
                                           ),
                                         ],
                                       ),

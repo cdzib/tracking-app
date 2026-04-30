@@ -15,7 +15,7 @@ class SettingsPage extends StatelessWidget {
       body: Stack(
         children: [
           Positioned.fill(
-            child: CustomPaint(painter: AmbientPainter()),
+            child: CustomPaint(painter: AmbientPainter(colorScheme)),
           ),
           Positioned(
             top: 0,
@@ -42,7 +42,7 @@ class SettingsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _SettingsTopBar(),
+                  TopBar(title: 'AJUSTES', subtitle: 'Ajustes y accesos de tu cuenta', icon: Icons.tune_rounded),
                   const SizedBox(height: 28),
                   const _SettingsHeroCard(),
                   const SizedBox(height: 22),
@@ -55,7 +55,7 @@ class SettingsPage extends StatelessWidget {
                         title: 'Perfil',
                         subtitle:
                             'Consulta y administra tu informacion personal.',
-                        accent: const Color(0xFFD4A853),
+                        accent: colorScheme.secondary,
                         onTap: () => Navigator.pushNamed(context, '/perfil'),
                       ),
                       const _CardDivider(),
@@ -154,8 +154,11 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class _SettingsTopBar extends StatelessWidget {
-  const _SettingsTopBar();
+class TopBar extends StatelessWidget {
+  final String title;
+  final String subtitle ;
+  final IconData icon;
+  TopBar({required this.title, required this.subtitle, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +172,7 @@ class _SettingsTopBar extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Icon(
-            Icons.tune_rounded,
+            icon,
             color: Theme.of(context).colorScheme.primary,
             size: 18,
           ),
@@ -180,7 +183,7 @@ class _SettingsTopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'AJUSTES',
+                title,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
                   letterSpacing: 3.2,
@@ -188,8 +191,10 @@ class _SettingsTopBar extends StatelessWidget {
               ),
               const SizedBox(height: 3),
               Text(
-                'Ajustes y accesos de tu cuenta',
-                style: Theme.of(context).textTheme.bodySmall,
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
             ],
           ),
@@ -226,12 +231,17 @@ class _SettingsHeroCard extends StatelessWidget {
         children: [
           Text(
             'Controla tu experiencia',
-            style: theme.textTheme.headlineLarge,
+            style: theme.textTheme.headlineLarge?.copyWith(
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             'Centraliza accesos rapidos para tu perfil, tus viajes y nuevas configuraciones dentro de una sola vista.',
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurface.withOpacity(0.8),
+            ),
           ),
           const SizedBox(height: 20),
           _HeroStatusRow(),
@@ -470,10 +480,13 @@ class _ThemeModeTile extends StatelessWidget {
       children: [
         Icon(Icons.brightness_6_rounded, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 16),
-        const Expanded(
+        Expanded(
           child: Text(
             'Tema',
-            // El color y estilo se hereda del theme en el tile
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            )
           ),
         ),
         DropdownButton<ThemeMode>(

@@ -24,7 +24,7 @@ class PerfilPage extends StatelessWidget {
             body: Stack(
               children: [
                 Positioned.fill(
-                  child: CustomPaint(painter: AmbientPainter()),
+                  child: CustomPaint(painter: AmbientPainter(colorScheme)),
                 ),
                 Positioned(
                   top: 0,
@@ -85,14 +85,14 @@ class PerfilPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         const _SectionLabel(label: 'ESTADO DE CUENTA'),
                         const SizedBox(height: 12),
-                        const _InfoCard(
+                        _InfoCard(
                           children: [
                             _StatusRow(
                               title: 'Cuenta activa',
                               subtitle:
                                   'Tu acceso esta habilitado para seguir viajando.',
                               icon: Icons.verified_user_outlined,
-                              accent: Color(0xFFD4A853),
+                              accent: colorScheme.secondary,
                             ),
                             _CardDivider(),
                             _StatusRow(

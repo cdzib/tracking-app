@@ -22,7 +22,7 @@ class CircleActionButton extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: theme.dividerColor),
         ),
-        child: Icon(icon, color: theme.iconTheme.color, size: 18),
+        child: BackButtonIcon()
       ),
     );
   }

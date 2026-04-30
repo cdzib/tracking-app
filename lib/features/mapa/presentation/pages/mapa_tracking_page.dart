@@ -396,25 +396,25 @@ class _MapaTrackingPageState extends State<MapaTrackingPage>
           margin: const EdgeInsets.only(right: 16),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFD4A853).withOpacity(0.15),
+            color: colorScheme.secondary.withOpacity(0.15),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFFD4A853).withOpacity(0.4),
+              color: colorScheme.secondary.withOpacity(0.4),
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.directions_bus_rounded,
-                color: Color(0xFFD4A853),
+                color: colorScheme.secondary,
                 size: 14,
               ),
               const SizedBox(width: 5),
               Text(
                 '$count activos',
-                style: const TextStyle(
-                  color: Color(0xFFD4A853),
+                style: TextStyle(
+                  color: colorScheme.secondary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -556,13 +556,13 @@ class _VehiclePanel extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFD4A853).withOpacity(0.15),
+                            color: colorScheme.secondary.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             '${vehicles.length}',
-                            style: const TextStyle(
-                              color: Color(0xFFD4A853),
+                            style: TextStyle(
+                              color: colorScheme.secondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -620,13 +620,13 @@ class _VehiclePanel extends StatelessWidget {
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFD4A853)
+                                    color: colorScheme.secondary
                                         .withOpacity(0.12),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.directions_bus_rounded,
-                                    color: Color(0xFFD4A853),
+                                    color: colorScheme.secondary,
                                     size: 20,
                                   ),
                                 ),

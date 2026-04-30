@@ -124,14 +124,14 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: Stack(
         children: [
           // ── Ambient background ─────────────────────────────────────────
           Positioned.fill(
-            child: CustomPaint(painter: _SplashAmbientPainter()),
+            child: CustomPaint(painter: _SplashAmbientPainter(colorScheme)),
           ),
 
           // ── Línea dorada superior ──────────────────────────────────────
@@ -141,13 +141,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
             right: 0,
             child: Container(
               height: 2,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    Color(0xFFD4A853),
-                    Color(0xFFF0C97A),
-                    Color(0xFFD4A853),
+                    colorScheme.secondary,
+                    colorScheme.tertiary,
+                    colorScheme.secondary,
                     Colors.transparent,
                   ],
                 ),
@@ -197,10 +197,10 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                       position: _textSlide,
                       child: Column(
                         children: [
-                          const Text(
+                          Text(
                             'VAGONETAS',
                             style: TextStyle(
-                              color: Color(0xFFD4A853),
+                              color: colorScheme.secondary,
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 6,
@@ -272,6 +272,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 class _LogoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 110,
       height: 110,
@@ -279,10 +280,10 @@ class _LogoWidget extends StatelessWidget {
         shape: BoxShape.circle,
         color: const Color(0xFF161616),
         border: Border.all(
-            color: const Color(0xFFD4A853).withOpacity(0.4), width: 1.5),
+            color: colorScheme.secondary.withOpacity(0.4), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFD4A853).withOpacity(0.2),
+            color: colorScheme.secondary.withOpacity(0.2),
             blurRadius: 40,
             spreadRadius: 4,
           ),
@@ -299,10 +300,10 @@ class _LogoWidget extends StatelessWidget {
           width: 62,
           height: 62,
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => const Icon(
+          errorBuilder: (_, __, ___) => Icon(
             Icons.directions_bus_rounded,
             size: 52,
-            color: Color(0xFFD4A853),
+            color: colorScheme.secondary,
           ),
         ),
       ),
@@ -319,13 +320,14 @@ class _DecorativeRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: const Color(0xFFD4A853).withOpacity(opacity),
+          color: colorScheme.secondary.withOpacity(opacity),
           width: 1,
         ),
       ),
@@ -336,6 +338,10 @@ class _DecorativeRing extends StatelessWidget {
 // ── Ambient painter ──────────────────────────────────────────────────────────
 
 class _SplashAmbientPainter extends CustomPainter {
+  final ColorScheme colorScheme;
+
+  _SplashAmbientPainter(this.colorScheme);
+
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
@@ -343,7 +349,7 @@ class _SplashAmbientPainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            const Color(0xFFD4A853).withOpacity(0.14),
+          colorScheme.secondary.withOpacity(0.14),
             Colors.transparent,
           ],
         ).createShader(Rect.fromCircle(
@@ -425,6 +431,7 @@ class _AnimatedDotsState extends State<_AnimatedDots>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(widget.dotCount, (i) {
@@ -437,7 +444,7 @@ class _AnimatedDotsState extends State<_AnimatedDots>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color:
-                  const Color(0xFFD4A853).withOpacity(_dotOpacities[i].value),
+                  colorScheme.secondary.withOpacity(_dotOpacities[i].value),
             ),
           ),
         );

@@ -61,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage>
               children: [
                 // ── Atmospheric background ──────────────────────────
                 Positioned.fill(
-                  child: CustomPaint(painter: AmbientPainter()),
+                  child: CustomPaint(painter: AmbientPainter(colorScheme)),
                 ),
 
                 // ── Decorative top accent line ───────────────────────
@@ -111,22 +111,22 @@ class _RegisterPageState extends State<RegisterPage>
                                           height: 32,
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                              color: const Color(0xFFD4A853),
+                                              color: colorScheme.secondary,
                                               width: 1.5,
                                             ),
                                             shape: BoxShape.circle,
                                           ),
-                                          child: const Icon(
+                                          child: Icon(
                                             Icons.explore_outlined,
-                                            color: Color(0xFFD4A853),
+                                            color: colorScheme.secondary,
                                             size: 16,
                                           ),
                                         ),
                                         const SizedBox(width: 10),
-                                        const Text(
+                                        Text(
                                           'VIAJA',
                                           style: TextStyle(
-                                            color: Color(0xFFD4A853),
+                                            color: colorScheme.secondary,
                                             fontSize: 11,
                                             fontWeight: FontWeight.w700,
                                             letterSpacing: 4,
@@ -409,7 +409,7 @@ class _RegisterPageState extends State<RegisterPage>
                                             ),
                                           ),
                                           child: RichText(
-                                            text: const TextSpan(
+                                            text: TextSpan(
                                               style: TextStyle(fontSize: 13.5),
                                               children: [
                                                 TextSpan(
@@ -420,7 +420,8 @@ class _RegisterPageState extends State<RegisterPage>
                                                 TextSpan(
                                                   text: 'Inicia sesión',
                                                   style: TextStyle(
-                                                    color: Color(0xFFD4A853),
+                                                    color:
+                                                        colorScheme.secondary,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -455,12 +456,14 @@ class _StepDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       width: active ? 8 : 6,
       height: active ? 8 : 6,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: active ? const Color(0xFFD4A853) : Colors.white12,
+        color: active ? colorScheme.secondary : Colors.white12,
       ),
     );
   }
@@ -513,6 +516,8 @@ class _StyledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
@@ -528,10 +533,10 @@ class _StyledTextField extends StatelessWidget {
           fontSize: 15,
           letterSpacing: 0.3,
         ),
-        cursorColor: const Color(0xFFD4A853),
+        cursorColor: colorScheme.secondary,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
+          hintStyle: TextStyle(color: Colors.white24, fontSize: 14),
           prefixIcon: Icon(icon, color: Colors.white30, size: 18),
           border: InputBorder.none,
           contentPadding:
@@ -555,6 +560,8 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return GestureDetector(
       onTap: isLoading ? null : onPressed,
       child: AnimatedContainer(
@@ -565,8 +572,8 @@ class _PrimaryButton extends StatelessWidget {
               ? const LinearGradient(
                   colors: [Color(0xFF2A2A2A), Color(0xFF2A2A2A)],
                 )
-              : const LinearGradient(
-                  colors: [Color(0xFFD4A853), Color(0xFFF0C97A)],
+              : LinearGradient(
+                  colors: [colorScheme.secondary, colorScheme.tertiary],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -575,7 +582,7 @@ class _PrimaryButton extends StatelessWidget {
               ? []
               : [
                   BoxShadow(
-                    color: const Color(0xFFD4A853).withOpacity(0.35),
+                    color: colorScheme.secondary.withOpacity(0.35),
                     blurRadius: 24,
                     offset: const Offset(0, 6),
                   ),
@@ -583,13 +590,13 @@ class _PrimaryButton extends StatelessWidget {
         ),
         child: Center(
           child: isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor:
-                        AlwaysStoppedAnimation<Color>(Color(0xFFD4A853)),
+                        AlwaysStoppedAnimation<Color>(colorScheme.secondary),
                   ),
                 )
               : Text(

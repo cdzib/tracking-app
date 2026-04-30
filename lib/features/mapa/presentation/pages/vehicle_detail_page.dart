@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:vagonetas_app/widgets/circule_action_button.dart';
+import 'package:vagonetas_app/widgets/custom_back_button.dart';
 import 'package:vagonetas_app/widgets/live_badge.dart';
 
 import '../../../../core/di/injector.dart';
@@ -151,10 +152,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                         child: Row(
                           children: [
-                            CircleActionButton(
-                              icon: Icons.arrow_back_ios_new_rounded,
-                              onTap: () => Navigator.pop(context),
-                            ),
+                            CustomBackButton(onTap: () => Navigator.pop(context)),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -163,7 +161,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> with SingleTicker
                                   Text(
                                     'TRACKING',
                                     style: TextStyle(
-                                      color: Color(0xFFD4A853),
+                                      color: colorScheme.secondary,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: 3,
@@ -255,7 +253,7 @@ class _LoadingCard extends StatelessWidget {
             height: 28,
             child: CircularProgressIndicator(
               strokeWidth: 2.3,
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD4A853)),
+              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.secondary),
             ),
           ),
           SizedBox(height: 16),
@@ -298,7 +296,7 @@ class _StateCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFFD4A853), size: 30),
+          Icon(icon, color: colorScheme.secondary, size: 30),
           const SizedBox(height: 14),
           Text(
             title,
@@ -370,12 +368,12 @@ class _VehicleInfoCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD4A853).withOpacity(0.12),
+                  color: colorScheme.secondary.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.directions_bus_rounded,
-                  color: Color(0xFFD4A853),
+                  color: colorScheme.secondary,
                 ),
               ),
               const SizedBox(width: 14),

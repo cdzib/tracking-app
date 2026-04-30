@@ -20,7 +20,7 @@ class HistorialPage extends StatelessWidget {
           body: Stack(
             children: [
               Positioned.fill(
-                child: CustomPaint(painter: AmbientPainter()),
+                child: CustomPaint(painter: AmbientPainter(colorScheme)),
               ),
               Positioned(
                 top: 0,
@@ -67,7 +67,7 @@ class HistorialPage extends StatelessWidget {
                           children: [
                             _HistoryTopBar(totalTrips: vm.historial.length),
                             const SizedBox(height: 28),
-                            _HistoryHeroCard(items: vm.historial),
+                            _HistoryHeroCard(items: vm.historial, context: context),
                             const SizedBox(height: 22),
                             const _SectionLabel(label: 'REGISTRO DE VIAJES'),
                             const SizedBox(height: 12),
@@ -116,7 +116,8 @@ class _HistoryTopBar extends StatelessWidget {
           width: 38,
           height: 38,
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.4),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary, width: 1.4),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -133,9 +134,9 @@ class _HistoryTopBar extends StatelessWidget {
               Text(
                 'HISTORIAL',
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  letterSpacing: 3.2,
-                ),
+                      color: Theme.of(context).colorScheme.primary,
+                      letterSpacing: 3.2,
+                    ),
               ),
               const SizedBox(height: 3),
               Text(
@@ -152,15 +153,15 @@ class _HistoryTopBar extends StatelessWidget {
 
 class _HistoryHeroCard extends StatelessWidget {
   final List<HistorialItem> items;
-
-  const _HistoryHeroCard({required this.items});
+  final BuildContext context;
+  const _HistoryHeroCard({required this.items, required this.context});
 
   int get completedCount => items
-      .where((item) => _tripStatus(item.descripcion).label == 'Completado')
+      .where((item) => _tripStatus(item.descripcion, context).label == 'Completado')
       .length;
 
   int get canceledCount => items
-      .where((item) => _tripStatus(item.descripcion).label == 'Cancelado')
+      .where((item) => _tripStatus(item.descripcion, context).label == 'Cancelado')
       .length;
 
   @override
@@ -218,7 +219,7 @@ class _HistoryHeroCard extends StatelessWidget {
                   child: _MetricBlock(
                     label: 'Completados',
                     value: completedCount.toString(),
-                    valueColor: const Color(0xFFD4A853),
+                    valueColor: colorScheme.secondary,
                   ),
                 ),
                 const SizedBox(
@@ -287,7 +288,7 @@ class _TripHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final status = _tripStatus(item.descripcion);
+    final status = _tripStatus(item.descripcion, context);
     final route = _extractRoute(item.descripcion);
 
     return Container(
@@ -480,7 +481,9 @@ class _LoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -489,7 +492,7 @@ class _LoadingState extends StatelessWidget {
             height: 28,
             child: CircularProgressIndicator(
               strokeWidth: 2.4,
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD4A853)),
+              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.secondary),
             ),
           ),
           SizedBox(height: 16),
@@ -517,6 +520,8 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -577,10 +582,10 @@ class _ErrorState extends StatelessWidget {
                     side: const BorderSide(color: Colors.white12),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Reintentar',
                   style: TextStyle(
-                    color: Color(0xFFD4A853),
+                    color: colorScheme.secondary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -600,6 +605,8 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -614,12 +621,12 @@ class _EmptyState extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: const Color(0xFFD4A853).withOpacity(0.12),
+              color: colorScheme.secondary.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.history_toggle_off_rounded,
-              color: Color(0xFFD4A853),
+              color: colorScheme.secondary,
               size: 30,
             ),
           ),
@@ -653,10 +660,10 @@ class _EmptyState extends StatelessWidget {
                 side: const BorderSide(color: Colors.white12),
               ),
             ),
-            child: const Text(
+            child: Text(
               'Actualizar',
               style: TextStyle(
-                color: Color(0xFFD4A853),
+                color: colorScheme.secondary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -679,20 +686,21 @@ class _TripStatus {
   });
 }
 
-_TripStatus _tripStatus(String descripcion) {
+_TripStatus _tripStatus(String descripcion, BuildContext context) {
   final text = descripcion.toLowerCase();
+  final colorScheme = Theme.of(context).colorScheme;
 
   if (text.contains('cancel')) {
-    return const _TripStatus(
+    return _TripStatus(
       label: 'Cancelado',
       color: Color(0xFF7EA1FF),
       icon: Icons.close_rounded,
     );
   }
 
-  return const _TripStatus(
+  return _TripStatus(
     label: 'Completado',
-    color: Color(0xFFD4A853),
+    color: colorScheme.secondary,
     icon: Icons.check_rounded,
   );
 }

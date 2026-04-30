@@ -34,7 +34,7 @@ class _HomeContentBody extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
-          Positioned.fill(child: CustomPaint(painter: AmbientPainter())),
+          Positioned.fill(child: CustomPaint(painter: AmbientPainter(colorScheme))),
           Positioned(
             top: 0, left: 0, right: 0,
             child: Container(
@@ -355,8 +355,9 @@ class _QuickAccess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final items = [
-      _QuickItem(icon: Icons.directions_bus_rounded, label: 'Reservar', color: const Color(0xFFD4A853)),
+      _QuickItem(icon: Icons.directions_bus_rounded, label: 'Reservar', color: colorScheme.secondary),
       _QuickItem(icon: Icons.map_rounded, label: 'Ver mapa', color: const Color(0xFF7EA1FF)),
       _QuickItem(icon: Icons.receipt_long_rounded, label: 'Mis reservas', color: const Color(0xFF8ED1A5)),
       _QuickItem(icon: Icons.person_outline_rounded, label: 'Mi perfil', color: const Color(0xFFEAA86C)),

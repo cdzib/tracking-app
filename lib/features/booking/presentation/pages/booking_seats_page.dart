@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:vagonetas_app/features/booking/domain/models/trip_summary.dart';
 import 'package:vagonetas_app/features/booking/presentation/viewmodel/booking_seats_viewmodel.dart';
 import 'package:vagonetas_app/widgets/ambient_painter.dart';
+import 'package:vagonetas_app/widgets/custom_back_button.dart';
 import 'package:vagonetas_app/widgets/legend_item.dart';
 import 'package:vagonetas_app/widgets/seat_selector.dart';
 
@@ -41,7 +42,7 @@ class _BookingSeatsPageState extends State<BookingSeatsPage> {
           backgroundColor: theme.scaffoldBackgroundColor,
           body: Stack(
             children: [
-              Positioned.fill(child: CustomPaint(painter: AmbientPainter())),
+              Positioned.fill(child: CustomPaint(painter: AmbientPainter(colorScheme))),
               Positioned(
                 top: 0,
                 left: 0,
@@ -73,41 +74,16 @@ class _BookingSeatsPageState extends State<BookingSeatsPage> {
                           // Top bar
                           Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: Center(
-                                  child: GestureDetector(
-                                    onTap: () => Navigator.pop(context),
-                                    child: Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.surface
-                                            .withOpacity(0.6),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                            color: colorScheme.onSurface
-                                                .withOpacity(0.12)),
-                                      ),
-                                      child: Icon(
-                                        Icons.arrow_back_ios_new_rounded,
-                                        color: colorScheme.onSurface
-                                            .withOpacity(0.7),
-                                        size: 14,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              CustomBackButton(onTap: () => Navigator.pop(context)),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'ASIENTOS',
                                       style: TextStyle(
-                                        color: Color(0xFFD4A853),
+                                        color: colorScheme.secondary,
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 3.2,
@@ -170,9 +146,9 @@ class _BookingSeatsPageState extends State<BookingSeatsPage> {
                     ),
                     Expanded(
                       child: vm.isLoading
-                          ? const Center(
+                          ? Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFFD4A853),
+                                color: colorScheme.secondary,
                               ),
                             )
                           : Padding(
@@ -206,13 +182,13 @@ class _BookingSeatsPageState extends State<BookingSeatsPage> {
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFD4A853), Color(0xFFF0C97A)],
+                            gradient: LinearGradient(
+                              colors: [colorScheme.secondary, colorScheme.tertiary],
                             ),
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFD4A853).withOpacity(0.3),
+                                color: colorScheme.secondary.withOpacity(0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
