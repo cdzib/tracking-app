@@ -65,7 +65,7 @@ class _HomeContentBody extends StatelessWidget {
                 slivers: [
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 26, 24, 0),
+                      padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -447,7 +447,10 @@ class _QuickItem {
   final Color color;
   final String route;
   const _QuickItem(
-      {required this.icon, required this.label, required this.color, required this.route});
+      {required this.icon,
+      required this.label,
+      required this.color,
+      required this.route});
 }
 
 class _QuickAccessTile extends StatelessWidget {
@@ -529,13 +532,26 @@ class _AvailableTripCard extends StatelessWidget {
                     color: colorScheme.secondary, size: 17),
               ),
               const Spacer(),
-              Text(
-                DateTimeUtils.formatDateTime(trip.trip?.datetime?.toString()),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: colorScheme.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    DateTimeUtils.formatDateRelative(
+                        trip.trip?.datetime?.toString()),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    DateTimeUtils.formatTime(trip.trip?.datetime?.toString()),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -616,7 +632,7 @@ class _RecentTripTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  DateTimeUtils.formatDateTime(
+                  DateTimeUtils.formatRelative(
                       recent.trip?.datetime?.toString()),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,

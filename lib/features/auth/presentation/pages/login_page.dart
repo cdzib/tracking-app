@@ -432,11 +432,11 @@ class _StyledTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white10),
-      ),
+      // decoration: BoxDecoration(
+      //   color: const Color(0xFF1E1E1E),
+      //   borderRadius: BorderRadius.circular(14),
+      //   border: Border.all(color: Colors.white10),
+      // ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,

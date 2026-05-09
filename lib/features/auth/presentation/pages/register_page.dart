@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vagonetas_app/features/settings/presentation/pages/settings_page.dart';
 import 'package:vagonetas_app/widgets/ambient_painter.dart';
+import 'package:vagonetas_app/widgets/custom_back_button.dart';
 
 import '../../../../core/di/injector.dart';
 import '../viewmodel/auth_viewmodel.dart';
@@ -100,58 +102,17 @@ class _RegisterPageState extends State<RegisterPage>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // Back button + brand
+
                                 Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 32,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: colorScheme.secondary,
-                                              width: 1.5,
-                                            ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.explore_outlined,
-                                            color: colorScheme.secondary,
-                                            size: 16,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          'VIAJA',
-                                          style: TextStyle(
-                                            color: colorScheme.secondary,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 4,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    // Back button
-                                    GestureDetector(
-                                      onTap: () => Navigator.pop(context),
-                                      child: Container(
-                                        width: 36,
-                                        height: 36,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.06),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: const Icon(
-                                          Icons.arrow_back_ios_new_rounded,
-                                          color: Colors.white54,
-                                          size: 14,
-                                        ),
-                                      ),
-                                    ),
+                                    CustomBackButton(),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: TopBar(
+                                          title: "VIAJA",
+                                          subtitle: "Explora el mundo",
+                                          icon: Icons.explore_outlined),
+                                    )
                                   ],
                                 ),
 
@@ -519,11 +480,11 @@ class _StyledTextField extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white10),
-      ),
+      // decoration: BoxDecoration(
+      //   color: const Color(0xFF1E1E1E),
+      //   borderRadius: BorderRadius.circular(14),
+      //   border: Border.all(color: Colors.white10),
+      // ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,

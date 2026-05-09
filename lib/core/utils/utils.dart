@@ -27,9 +27,16 @@ class DateTimeUtils {
       0 => 'Hoy, $time',
       1 => 'Mañana, $time',
       -1 => 'Ayer, $time',
-      _ when diff > 1 && diff <= 7 => '${_weekdayName(dateTime.weekday)}, $time',
+      _ when diff > 1 && diff <= 7 =>
+        '${_weekdayName(dateTime.weekday)}, $time',
       _ => DateFormat('dd MMM yyyy, h:mm a').format(dateTime),
     };
+  }
+  /// 12 Mar 2025
+  static String formatDateRelative(String? dateTimeStr) {
+    final dateTime = tryParse(dateTimeStr);
+    if (dateTime == null) return dateTimeStr ?? '';
+    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 
   /// 12 Mar 2025, 3:45 PM
@@ -74,10 +81,10 @@ class DateTimeUtils {
     final (value, unit) = switch (absDiff) {
       _ when absDiff.inSeconds < 60 => (absDiff.inSeconds, 'segundo'),
       _ when absDiff.inMinutes < 60 => (absDiff.inMinutes, 'minuto'),
-      _ when absDiff.inHours < 24   => (absDiff.inHours, 'hora'),
-      _ when absDiff.inDays < 30    => (absDiff.inDays, 'día'),
-      _ when absDiff.inDays < 365   => (absDiff.inDays ~/ 30, 'mes'),
-      _                             => (absDiff.inDays ~/ 365, 'año'),
+      _ when absDiff.inHours < 24 => (absDiff.inHours, 'hora'),
+      _ when absDiff.inDays < 30 => (absDiff.inDays, 'día'),
+      _ when absDiff.inDays < 365 => (absDiff.inDays ~/ 30, 'mes'),
+      _ => (absDiff.inDays ~/ 365, 'año'),
     };
 
     final plural = value != 1 ? _pluralize(unit) : unit;
@@ -107,7 +114,8 @@ class DateTimeUtils {
   static bool isTomorrow(String? dateTimeStr) {
     final dateTime = tryParse(dateTimeStr);
     if (dateTime == null) return false;
-    return isToday(dateTime.subtract(const Duration(days: 1)).toIso8601String());
+    return isToday(
+        dateTime.subtract(const Duration(days: 1)).toIso8601String());
   }
 
   /// true si ambas fechas caen en el mismo día (ignora la hora)
@@ -157,25 +165,4 @@ class DateTimeUtils {
         'mes' => 'meses',
         _ => '${unit}s',
       };
-
-  static String formatDateTime(String? dateTimeStr) {
-    if (dateTimeStr == null) return '';
-    try {
-      final dateTime = DateTime.parse(dateTimeStr);
-      final now = DateTime.now();
-      final difference = dateTime.difference(now);
-
-      if (difference.inDays == 0) {
-        return 'Hoy, ${DateFormat('h:m a').format(dateTime)}';
-      } else if (difference.inDays == 1) {
-        return 'Mañana, ${DateFormat('h:m a').format(dateTime)}';
-      } else if (difference.inDays == -1) {
-        return 'Ayer, ${DateFormat('h:m a').format(dateTime)}';
-      } else {
-        return DateFormat('dd MMM, h:m a').format(dateTime);
-      }
-    } catch (e) {
-      return dateTimeStr; // Si no se puede parsear, devuelve el string original
-    }
-  }
 }
